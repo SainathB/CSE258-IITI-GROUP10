@@ -5,7 +5,7 @@ Wavelength=[];
 Transmission=[];
 j=1;
 l=1;
-for i=1:len
+ for i=1:len
     
     if mod(i,2)
        Wavelength(j)=y(i);
