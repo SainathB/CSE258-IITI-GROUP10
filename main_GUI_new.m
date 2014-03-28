@@ -1,6 +1,6 @@
-function varargout = main_GUI(varargin)
+function varargout = main_GUI_new(varargin)
 
-% MAIN_GUI M-file for main_GUI.fig
+% MAIN_GUI M-file for main_GUI_new.fig
 %      MAIN_GUI, by itself, creates a new MAIN_GUI or raises the existing
 %      singleton*.
 %
@@ -12,25 +12,25 @@ function varargout = main_GUI(varargin)
 %
 %      MAIN_GUI('Property','Value',...) creates a new MAIN_GUI or raises the
 %      existing singleton*.  Starting from the left, property value pairs are
-%      applied to the GUI before main_GUI_OpeningFcn gets called.  An
+%      applied to the GUI before main_GUI_new_OpeningFcn gets called.  An
 %      unrecognized property name or invalid value makes property application
-%      stop.  All inputs are passed to main_GUI_OpeningFcn via varargin.
+%      stop.  All inputs are passed to main_GUI_new_OpeningFcn via varargin.
 %
 %      *See GUI Options on GUIDE's Tools menu.  Choose "GUI allows only one
 %      instance to run (singleton)".
 %
 % See also: GUIDE, GUIDATA, GUIHANDLES
 
-% Edit the above text to modify the response to help main_GUI
+% Edit the above text to modify the response to help main_GUI_new
 
-% Last Modified by GUIDE v2.5 23-Mar-2014 08:18:56
+% Last Modified by GUIDE v2.5 26-Mar-2014 11:07:03
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
                    'gui_Singleton',  gui_Singleton, ...
-                   'gui_OpeningFcn', @main_GUI_OpeningFcn, ...
-                   'gui_OutputFcn',  @main_GUI_OutputFcn, ...
+                   'gui_OpeningFcn', @main_GUI_new_OpeningFcn, ...
+                   'gui_OutputFcn',  @main_GUI_new_OutputFcn, ...
                    'gui_LayoutFcn',  [] , ...
                    'gui_Callback',   []);
                
@@ -45,14 +45,14 @@ else
 end
 % End initialization code - DO NOT EDIT
 
-% --- Executes just before main_GUI is made visible.
-function main_GUI_OpeningFcn(hObject, eventdata, handles, varargin)
+% --- Executes just before main_GUI_new is made visible.
+function main_GUI_new_OpeningFcn(hObject, eventdata, handles, varargin)
 % This function has no output args, see OutputFcn.
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-% varargin   command line arguments to main_GUI (see VARARGIN)
-% Choose default command line output for main_GUI
+% varargin   command line arguments to main_GUI_new (see VARARGIN)
+% Choose default command line output for main_GUI_new
 
 global TS T TMax TMin l_intf
 if isempty(TS)==0
@@ -83,12 +83,12 @@ handles.output = hObject;
 % Update handles structure
 guidata(hObject, handles);
 
-% UIWAIT makes main_GUI wait for user response (see UIRESUME)
+% UIWAIT makes main_GUI_new wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = main_GUI_OutputFcn(hObject, eventdata, handles) 
+function varargout = main_GUI_new_OutputFcn(hObject, eventdata, handles) 
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -223,41 +223,35 @@ plot(TS(:,1),TS(:,2),'r')
 xlabel('Wavelength(nm)');ylabel('Transmittance (%)')
 end
 
-% --- Executes on button press in get_data.
-function get_maxima_Callback(hObject, eventdata, handles)
-% hObject    handle to get_data (see GCBO)
+% --- Executes on button press in disp_envelope_curves.
+function disp_envelope_curves_Callback(hObject, eventdata, handles)
+% hObject    handle to disp_envelope_curves (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-global fig_get_maxima T
-
-if isempty(T)==1
-    errordlg('Transmission Spectrum is not available to Choose Maxima',...
-        'Transmission Spectrum Unavailable','modal');
-else
-fig_get_maxima=figure;
-    plot(T(:,1),T(:,2))
-xlabel('Wavelength(nm)');ylabel('Sample Transmittance (%)')
-sh = uicontrol(fig_get_maxima,'Style','pushbutton',...
-               'Position',[350 50 100 30],...
-               'String','Accept Maxima',...
-               'Callback',@Accept_Maxima_callback);
-     global p
-p=handles.TMax;             
-datacursormode on
+global T TMax TMin l_min l_max l_intf;
+T(:,2)=smooth(T(:,1),T(:,2),11,'sgolay',5);
+%TMax(:,1)=T(:,1);
+%TMin(:,1)=T(:,1);
+T_valid=[];
+[d1 d2]=size(T);
+count=0;
+for i=1:d1
+    if (T(i,1)>l_min && T(i,1)<l_max)
+        count=count+1;
+        T_valid(count,:)=T(i,:);
+    end
 end
-function Accept_Maxima_callback(hObject,eventdata,handles)
-global fig_get_maxima TMax
-dcm_obj = datacursormode(fig_get_maxima);
-c_info = getCursorInfo(dcm_obj);
+[TMax TMin l_intf]=envelope(T_valid(:,1),T_valid(:,2),'linear');
+fig_envelope=figure;
+plot(T(:,1),T(:,2),'r',TMax(:,1),TMax(:,2),'b',TMin(:,1),TMin(:,2),'g');
+xlabel('wavelength(nm)');
+ylabel('Transmittance(nm)');
+legend('red-smoothened data','blue-max envelope curve','green-min envelope curve');
+set(handles.TMax,'Value',1);
+set(handles.TMin,'Value',1);
+set(handles.l_intf,'Value',1);
 
-if isempty(c_info)==1  %no data is selected
-    errordlg('Select maxima of the transmission curve','Data point not selected','modal')
-else
-    TMax=get_selected_data(c_info)
-close(fig_get_maxima)
-global p
-set(p,'Value',1)
-end
+
 
 function [B]=get_selected_data(A)
 a={A.Position};
@@ -268,87 +262,6 @@ for i=1:n
     B(i,1)=a{i}(1);
     B(i,2)=a{i}(2);
 end
-
-
-% --- Executes on button press in get_minima.
-function get_minima_Callback(hObject, eventdata, handles)
-% hObject    handle to get_minima (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-global fig_get_minima T
-if isempty(T)==1
-    errordlg('Transmission Spectrum is not available to Choose Minima',...
-        'Transmission Spectrum Unavailable','modal');
-else
-fig_get_minima=figure;
-plot(T(:,1),T(:,2))
-xlabel('Wavelength(nm)');ylabel('Sample Transmittance (%)')
-sh = uicontrol(fig_get_minima,'Style','pushbutton',...
-               'Position',[350 50 100 30],...
-               'String','Accept Minima',...
-               'Callback',@Accept_Minima_callback);
-global q
-q=handles.TMin;             
-                  
-datacursormode on
-end
-
-function Accept_Minima_callback(hObject,eventdata)
-global fig_get_minima TMin
-dcm_obj = datacursormode(fig_get_minima);
-c_info = getCursorInfo(dcm_obj);
-
-if isempty(c_info)==1  %no data is selected
-    errordlg('Select minima of the transmission curve','Data point not selected','modal')
-else
-    TMin=get_selected_data(c_info)
-close(fig_get_minima)
-global q
-set(q,'Value',1)
-end
-
-% --- Executes on button press in First_Extrema.
-function First_Extrema_Callback(hObject, eventdata, handles)
-% hObject    handle to First_Extrema (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-
-global fig_get_FE T
-if isempty(T)==1
-    errordlg('Transmission Spectrum is not available to Choose First Extrema',...
-        'Transmission Spectrum Unavailable','modal');
-else
-fig_get_FE=figure;
-plot(T(:,1),T(:,2))
-xlabel('Wavelength(nm)');ylabel('Sample Transmittance (%)')
-sh = uicontrol(fig_get_FE,'Style','pushbutton',...
-               'Position',[350 50 125 30],...
-               'String','Accept First Extrema',...
-               'Callback',@Accept_First_Extrema_callback);
-global r
-r=handles.l_intf;             
-                  
-datacursormode on
-end
-
-function Accept_First_Extrema_callback(hObject,eventdata)
-global fig_get_FE l_intf
-dcm_obj = datacursormode(fig_get_FE);
-c_info = getCursorInfo(dcm_obj);
-
-if isempty(c_info)==1  %no data is selected
-    errordlg('Select first extrema of the fringes of transmission curve','Data point not selected','modal')
-else
-    FE=get_selected_data(c_info);
-close(fig_get_FE)
-global r
-set(r,'Value',1)
-l_intf1=FE(1);
-l_intf=l_intf1-0.01
-end
-
 
 
 
@@ -562,7 +475,7 @@ function edit3_CreateFcn(hObject, eventdata, handles)
 % handles    empty - handles not created until after all CreateFcns called
 
 global l_max
-l_max=1000;
+l_max=900;
 set(hObject,'String',l_max);
 
 % Hint: edit controls usually have a white background on Windows.
@@ -864,3 +777,30 @@ function text5_ButtonDownFcn(hObject, eventdata, handles)
 % hObject    handle to text5 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in TMax.
+function TMax_Callback(hObject, eventdata, handles)
+% hObject    handle to TMax (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of TMax
+
+
+% --- Executes on button press in TMin.
+function TMin_Callback(hObject, eventdata, handles)
+% hObject    handle to TMin (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of TMin
+
+
+% --- Executes on button press in l_intf.
+function l_intf_Callback(hObject, eventdata, handles)
+% hObject    handle to l_intf (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of l_intf
