@@ -96,7 +96,7 @@ function [d,m1,B]=Thickness_and_order_No(TS,TMax,TMin,array)
 % plotting lambda/2 vs n/lambda curve for all extrema
 kmax=numel(array);
 Lby2=(0:1:(kmax-1))/2;
-clear A
+clear A   % for A, first col=lambda, second col=n/lambda, third col=lby2
 for k=1:kmax
     l=array(k);
    
@@ -161,7 +161,7 @@ set(gca,'Ytick',interval);
 % Refining the value of ref indices with the obtained values of thickness
 % and order NO.
 
-clear B
+clear B       %for  b, first col=lambda, second col=refined ref index, third col=order of all extremas
 for k=1:kmax
     
     l=array(k);

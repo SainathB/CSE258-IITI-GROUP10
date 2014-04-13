@@ -4,7 +4,7 @@ function [chi_sq]=comparison(T,TS,d,CR,A,l_intf,l_min,l_max,dl)
 %         d is the thickness calculated from 'Thickness_and_ref_index' program
 %         CR is the coeff of ref index of equation 
 %         n(lambda)=CR(1)+CR(2)/lambda^2 calculated from 'Thickness_and_ref_index' program
-%         B is a 3 column matrix giving wavelength, absorption coeff, 
+%         A is a 3 column matrix giving wavelength, absorption coeff, 
 %         attenuation coeff in it's 1st, 2nd and 3rd column respectively
 
 
