@@ -444,8 +444,8 @@ fig2=figure;
     l_min,l_max,l_step,indicator);
 
 r=CR(1)+CR(2)/((550).^2);
-d = floor(d*10)/10 ; %to take upto 1 digit beyond integer
-r = floor(r*100)/100;  %to take upto 2 digit beyond integer
+d = floor(d*10)/10 ; %to take upto 1 digit beyong integer
+r = floor(r*100)/100;  %to take upto 2 digit beyong integer
 
 
 Thickness_string=sprintf('%s %d %s','Thickness=',d,'nm');

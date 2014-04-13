@@ -1,8 +1,8 @@
-function[d,B]=Thickness_and_ref_index(TS, TMax,TMin,l_intf,l_th)
+function[d,B]=Thickness_and_ref_index_a(TS, TMax,TMin,l_intf,l_th)
 %Input=> TS is the transmission spectrum for Bare Substrate
 %        TMax is the matrix giving the data points of maxima
 %        TMin is the matrix giving the data points of minima
-%In all cases, wavelength is to be given in nm unit and transmittance in
+%In all cases, wavelength is to be given in nm unit ant transmittance in
 %fraction(not in percentage)
 %        l_th is the threshold wavelength above which extrema are to be considered for the
 %        calculation of ref. index
@@ -13,12 +13,12 @@ if l_intf>l_th
     error('l_intf can not be greater than l_th')
 end
 
-%trimming the values of TMax by taking values greater than l_intf
+
 Lambda_TMax=TMax(:,1);
 i=find(Lambda_TMax>l_intf);
 TMax=[TMax(i,1) TMax(i,2)];
 
-%trimming the values of TMin by taking values greater than l_intf
+
 Lambda_TMin=TMin(:,1);
 j=find(Lambda_TMin>l_intf);
 TMin=[TMin(j,1) TMin(j,2)];
@@ -28,7 +28,7 @@ if numel(TMax(:,1))<2  |  numel(TMin(:,1))<2
     error('Number of extrema in the weakly absorbing region is insufficient to apply the method.')
 end
 
-[d,B]=Thickness_and_ref_index1(TS,TMax,TMin,l_th);
+[d,B]=Thickness_and_ref_index1(TS, TMax,TMin,l_th);
 
 if d~[];
 
@@ -95,36 +95,39 @@ function [d,m1,B]=Thickness_and_order_No(TS,TMax,TMin,array)
 
 % plotting lambda/2 vs n/lambda curve for all extrema
 kmax=numel(array);
-Lby2=(0:1:(kmax-1))/2      %array of half integers and integers
-clear A
+Lby2=(0:1:(kmax-1))/2;
+clear A   % for A, first col=lambda, second col=n/lambda, third col=lby2
 for k=1:kmax
     l=array(k);
    
-    A(k,1)=l;     %Ais a matrix with first col=lambda, second col=n/lambda,third col=lby2
+    A(k,1)=l;
     
 Ts=interp1(TS(:,1),TS(:,2),l,'linear','extrap');
 TM=interp1(TMax(:,1),TMax(:,2), l,'parabola');
 Tm=interp1(TMin(:,1),TMin(:,2), l,'parabola');
 
 s=(1/Ts)+((1/Ts^2)-1)^0.5;
-N=(2*s*(TM-Tm)/(TM*Tm))+0.5*(s^2+1);
+N=-(2*s*(TM-Tm)/(TM*Tm))+0.5*(s^2+1);
+if N<s
+    N=s; % exceptional see the next expression for n
+end
 n=[N+(N^2-s^2)^0.5]^0.5;
 
-A(k,2)=n/l;            % l is used for lambda and lby2 is the set of integers and half integers i.e l in the original eqn l/2=2d(n/lambda)-m1
+A(k,2)=n/l;
 A(k,3)=Lby2(k);
 end
 
 subplot(2,2,1)
 %plot(A(:,2),A(:,3),'.');xlabel('n/lambda at extrema');ylabel('l/2')
 
-%calculation of the order No. of first extrema (m1)
-calculated_m1=-interp1(A(:,2),A(:,3),0,'linear','extrap');         %eqn being used is l/2=2d(n/lambda)-m1 where l=0,1,2,3...and m1 is order of first extrema
-                                          
+% calculation of the order No. of first extrema
+calculated_m1=-interp1(A(:,2),A(:,3),0,'linear','extrap');
+
 if ismember(array(1),TMax(:,1))
-estimated_m1=round(calculated_m1);
+    estimated_m1=floor(calculated_m1)+0.5;
 
 else
-estimated_m1=floor(calculated_m1)+0.5;
+estimated_m1=round(calculated_m1);
 end
 
     I=0;
@@ -157,8 +160,8 @@ set(gca,'Ytick',interval);
 
 % Refining the value of ref indices with the obtained values of thickness
 % and order NO.
- 
-clear B   %for   b
+
+clear B       %for  b, first col=
 for k=1:kmax
     
     l=array(k);
