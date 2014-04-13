@@ -64,6 +64,6 @@ end
     Y(i)=calc_reflectivity(widths,n_store_temp,alpha_store_temp,s_temp);
 end
 Y=Y';
-R_fina[X Y];
+R_final=[X Y];
 end
 
