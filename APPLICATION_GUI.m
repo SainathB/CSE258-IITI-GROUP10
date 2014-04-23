@@ -22,7 +22,7 @@ function varargout = APPLICATION_GUI(varargin)
 
 % Edit the above text to modify the response to help APPLICATION_GUI
 
-% Last Modified by GUIDE v2.5 23-Apr-2014 18:41:21
+% Last Modified by GUIDE v2.5 23-Apr-2014 21:28:52
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -87,3 +87,11 @@ function pushbutton2_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 openfig('gui.fig','reuse');
+
+
+% --- Executes on button press in pushbutton3.
+function pushbutton3_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton3 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+openfig('main_GUI.fig','reuse');
