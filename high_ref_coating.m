@@ -1,4 +1,4 @@
-function [widths R_final]= high_ref_coating(lambda,R_req,n1,alpha1,TS,n2,alpha2)
+function [widths R_final R_Max]= high_ref_coating(lambda,R_req,n1,alpha1,TS,n2,alpha2)
 %the function takes in lambda for which high reflectance coating is needed
 %R_req is the minimum reflectance that is required
 %n1 and alpha1 are the ref index and absorption coeff for material 1
@@ -8,6 +8,8 @@ function [widths R_final]= high_ref_coating(lambda,R_req,n1,alpha1,TS,n2,alpha2)
 %the function return widths which is a vector containing thickness of the
 %layers
 %R_final is the matrix containing final reflectivity corr to each lambda
+%R_Max is the maximum reflectivity which can be achieved for the given
+%lambda
 n1=sortrows(n1,1);
 n2=sortrows(n2,1);
 alpha1=sortrows(alpha1,1);
@@ -23,10 +25,10 @@ s=(1/Ts)+((1/Ts^2)-1)^0.5;
 widths(1)=lambda/(4*N1);
 n_store(1)=N1;
 alpha_store(1)=A1;
-Rf=calc_reflectivity(widths,n_store,alpha_store,s);
+c=1;
+Rf(c)=calc_reflectivity(widths,n_store,alpha_store,s);
 i=1;
-disp(Rf);
-while Rf<R_req
+while Rf(c)<R_req
     i=i+1;
     widths(i)=lambda/(4*N2);
     n_store(i)=N2;
@@ -35,9 +37,20 @@ while Rf<R_req
     widths(i)=lambda/(4*N1);
     n_store(i)=N1;
     alpha_store(i)=A1;
-    Rf=calc_reflectivity(widths,n_store,alpha_store,s);
+    c=c+1;
+    Rf(c)=calc_reflectivity(widths,n_store,alpha_store,s);
+    if Rf(c)<=Rf(c-1)
+        widths(i)=[];
+        widths(i-1)=[];
+        n_store(i)=[];
+        n_store(i-1)=[];
+        alpha_store(i)=[];
+        alpha_store(i-1)=[];
+        Rf(c)=[];
+        break;
+    end
 end
-
+R_Max=Rf(end);
 if n1(end,1)<n2(end,1)
     n_max=n1(end,1);
 else

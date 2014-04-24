@@ -280,12 +280,12 @@ function run_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 global n1 n2 TS alpha_1 alpha_2
-global lambda ref R_final
+global lambda ref R_final R_Max
 if isempty(TS)==1||isempty(n1)==1||isempty(n2)==1||isempty(alpha_1)==1||isempty(alpha_2)==1
     errordlg('Proper Input is not available to run the program')
 else
 
-[widths,R_final]=high_ref_coating(lambda,ref,n1,alpha_1,TS,n2,alpha_2);
+[widths,R_final,R_Max]=high_ref_coating(lambda,ref,n1,alpha_1,TS,n2,alpha_2);
 
 siz=numel(widths);
 no_high_layers=(siz+1)/2;
@@ -296,8 +296,9 @@ layers_string1=sprintf('%s %d' ,'No. of high_ref layers=',no_high_layers);
 layers_string2=sprintf('%s %d','No. of low_ref layers=',no_low_layers);
 width_string1=sprintf('%s %d','Width of high_ref layers=',widths(1));
 width_string2=sprintf('%s %d','Width of low_ref layers=',widths(2));
+Max_reflectivity=sprintf('%s %d','Reflectivity which can be achieved=',R_Max);
 
-set(handles.summary,'String',{layers_string1;layers_string2;width_string1;width_string2});
+set(handles.summary,'String',{layers_string1;layers_string2;width_string1;width_string2;Max_reflectivity});
 end
 
 
@@ -307,7 +308,7 @@ function display_graph_Callback(hObject, eventdata, handles)
 % hObject    handle to display_graph (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-global R_final n1 n2 TS alpha_1 alpha_2
+global R_final n1 n2 TS alpha_1 alpha_2 R_Max lambda
 
 if isempty(TS)==1 & isempty(n1)==1 & isempty(n2)==1 & isempty(alpha_1)==1 & isempty(alpha_2)==1 
   errordlg('Files for both material 1 and material 2 and substrate transmission are Unavailable','Data Unavailable','modal')
@@ -321,7 +322,7 @@ elseif isempty(n2)==1 & isempty(alpha_2)==1
     errordlg('some unexpected error try again','sorry','modal')
 else  
   fig_ref_lambda=figure;
-plot(R_final(:,1),R_final(:,2))
+plot(R_final(:,1),R_final(:,2),lambda,R_Max,'r*')
 xlabel('Wavelength(nm)');ylabel('Reflectance(%)')
 end
 
