@@ -78,7 +78,7 @@ function pushbutton1_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-openfig('main_GUI_new.fig','reuse');
+run('main_GUI_new.m');
 
 
 % --- Executes on button press in pushbutton2.
@@ -86,7 +86,7 @@ function pushbutton2_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton2 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-openfig('gui.fig','reuse');
+run('gui.m');
 
 
 % --- Executes on button press in pushbutton3.
@@ -94,4 +94,4 @@ function pushbutton3_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton3 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-openfig('main_GUI.fig','reuse');
+run('main_GUI.m');
